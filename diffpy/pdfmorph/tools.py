@@ -1,9 +1,8 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
 #                   Simon J. L. Billinge
-#                   (c) 2010 Trustees of the Columbia University
+#                   (c) 2008 Trustees of the Columbia University
 #                   in the City of New York.  All rights reserved.
 #
 # File coded by:    Chris Farrow
@@ -12,34 +11,38 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+"""Collection of functions and classes for manipulating pdfs."""
 
-
-"""Tools used in morphs and morph chains.
-"""
-
-# module version
-__id__ = "$Id: tools.py 1613 2012-03-14 18:56:22Z juhas $"
-
-
+import re
 import numpy
+from numpy import pi
 
-def estimateScale(yobjin, yrefin):
-    """Set the scale that best matches the objective to the reference."""
-    dot = numpy.dot
-    scale = dot(yobjin, yrefin) / dot(yobjin, yobjin)
-    return scale
+# FIXME - common functionality like this needs to be factored out. Things like
+# this exist in SrFit and PDFgui. We need a common, python-only package for
+# this sort of stuff.
+def readPDF(fname):
+    """Reads an .gr file, loads r and G(r) vectors.
 
-def estimateBaselineSlope(r, gr, rmin = None, rmax = None):
+    fname -- name of the file we want to read.
+
+    Returns r and gr arrays.
+
+    """
+    from numpy import loadtxt
+    
+    data = open(fname).read()
+    pos = re.search(r'^#+ +start data', data, re.M).start()
+    nlines = data[:pos].count('\n')
+    r, gr = loadtxt(fname, skiprows=nlines, usecols=(0, 1), unpack=True)
+    return r, gr
+
+def estimateBaselineSlope(r, gr):
     """Estimate the slope of the linear baseline of a PDF.
 
     This fits a the equation slope*r through the bottom of the PDF.
 
     r       --  The r-grid used for the PDF.
     gr      --  The PDF over the r-grid.
-    rmin    --  The minimum r-value to consider. If this is None (default)
-                is None, then the minimum of r is used.
-    rmax    --  The maximum r-value to consider. If this is None (default)
-                is None, then the maximum of r is used.
 
     Returns the slope of baseline. If the PDF is scaled properly, this is equal
     to -4*pi*rho0.
@@ -47,28 +50,18 @@ def estimateBaselineSlope(r, gr, rmin = None, rmax = None):
     """
     from scipy.optimize import leastsq
     from numpy import dot
-
-    rp = r.copy()
-    grp = gr.copy()
-    if rmax is not None:
-        grp = grp[ rp <= rmax ]
-        rp = rp[ rp <= rmax ]
-    if rmin is not None:
-        grp = grp[ rp >= rmin ]
-        rp = rp[ rp >= rmin ]
-
     def chiv(pars):
 
         slope = pars[0]
         # This tries to fit the baseline through the center of the PDF.
-        chiv = grp - slope * rp
+        chiv = gr - slope * r
 
         # This adds additional penalty if there are negative terms, that
         # is, if baseline > PDF.
         diff = chiv.copy()
         diff[diff > 0] = 0
         negpenalty = dot(diff, diff)
-        chiv *= 1 + 0.5*negpenalty
+        chiv *= 1 + negpenalty
 
         return chiv
 
@@ -78,35 +71,100 @@ def estimateBaselineSlope(r, gr, rmin = None, rmax = None):
     # Return the slope
     return slope
 
+def PDFtoRDF(r, gr, rho0 = None):
+    """Transform a PDF into the RDF.
 
-def getRw(chain):
-    """Get Rw from the outputs of a morph or chain."""
-    # Make sure we put these on the proper grid
-    xobj, yobj, xref, yref = chain.xyallout
-    diff = yref - yobj
-    rw = numpy.dot(diff, diff)
-    rw /= numpy.dot(yref, yref)
-    rw = rw**0.5
-    return rw
+    R(r) = r*(G(r) + 4*pi*rho0*r)
 
-def getPearson(chain):
-    from scipy.stats.stats import pearsonr
-    xobj, yobj, xref, yref = chain.xyallout
-    pcc, pval = pearsonr(yobj, yref)
-    return pcc
+    r       --  The r-grid used for the PDF.
+    gr      --  The PDF over the r-grid.
+    rho0    --  The number density of the sample giving the PDF. If this is
+                None (defualt), then it will be estimated using
+                estimateBaselineSlope.
 
-def readPDF(fname):
-    """Reads an .gr file, loads r and G(r) vectors.
-
-    fname -- name of the file we want to read.
-
-    Returns r and gr arrays.
+    Returns R(r) over the r-grid.
 
     """
-    from diffpy.utils.parsers import loadData
 
-    rv = loadData(fname, unpack=True)
-    if len(rv) >= 2:
-        return rv[:2]
-    return (None, None)
+    if rho0 is not None:
+        slope = -4*pi*rho0
+    else:
+        slope = estimateBaselineSlope(r, gr)
 
+    rr = (gr - slope*r) * r
+
+    return rr
+
+def RDFtoPDF(r, rr, rho0):
+    """Transform a RDF into the PDF.
+
+    R(r) = r*(G(r) + 4*pi*rho0*r)
+    G(r) = R(r) / r - 4*pi*rho0*r
+
+    r       --  The r-grid used for the RDF.
+    rr      --  The RDF over the r-grid.
+    rho0    --  The density of the sample giving the RDF.
+
+    Returns G(r) over the r-grid.
+
+    """
+
+    gr = rr/r
+    if r[0] == 0:
+        gr[0] = 0
+
+    gr -= 4 * pi * rho0 * r
+
+    return gr
+
+def broadenPDF(r, gr, ss, rho0 = 0):
+    """Uniformly broaden the peaks of the PDF.
+
+    This simulates PDF peak broadening from thermal or other effects.  This
+    calculates the RDF from the PDF, and then convolutes it with a Gaussian of
+    of variance ss, and transforms back to the PDF.
+
+    r       --  The r-grid used for the PDF.
+    gr      --  The PDF over the r-grid.
+    ss      --  The sigma^2 to broaden the peaks by.
+    rho0    --  The number density of the sample giving the PDF. If this is
+                None (defualt), then it will be estimated using
+                estimateBaselineSlope.
+
+    Returns the broadened gr.
+
+    """
+
+    rr = PDFtoRDF(r, gr, rho0)
+
+    # The Gaussian to convolute with. No need to normalize, we'll do that
+    # later.
+    r0 = r[len(r) / 2]
+    gaussian = numpy.exp(-0.5 * (r - r0)**2 / ss )
+    from pylab import plot, show
+
+    # Get the full convolution
+    c = numpy.convolve(rr, gaussian, mode="full")
+    # Find the centroid of the RDF, we don't want this to change from the
+    # convolution.
+    s1 = sum(rr)
+    x1 = numpy.arange(len(rr), dtype=float)
+    c1idx = numpy.sum(rr * x1)/s1
+    # Find the centroid of the convolution
+    xc = numpy.arange(len(c), dtype=float)
+    ccidx = numpy.sum(c * xc)/sum(c)
+    # Interpolate the convolution such that the centroids line up. This
+    # uses linear interpolation.
+    shift = ccidx - c1idx
+    x1 += shift
+    c = numpy.interp(x1, xc, c)
+
+    # Normalize so that the integrated magnitude of the RDF doesn't change.
+    sc = sum(c)
+    if sc > 0:
+        c *= s1/sc
+
+    # Now get the PDF back.
+    gr2 = RDFtoPDF(r, c, rho0)
+
+    return gr2

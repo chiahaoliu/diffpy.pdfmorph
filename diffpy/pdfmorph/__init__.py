@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # pdfmorph          by DANSE Diffraction group
@@ -16,9 +15,9 @@
 """Tools for manipulating and comparing PDFs.
 """
 
-__id__ = "$Id: __init__.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 # obtain version information
-__version__ = '1.0'
+from diffpy.pdfmorph.version import __version__
 
 # End of file
