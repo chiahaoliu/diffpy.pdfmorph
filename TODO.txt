@@ -1,3 +1,1 @@
-* Add qmax filtering, automatic qmax detection.
-* Factor out data loading and writing. diffpy.tools?
-
+Add qmax filtering, automatic qmax detection.
