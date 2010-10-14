@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -18,16 +17,18 @@
 """
 
 # module version
-__id__ = "$Id: morphpdftordf.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
+
 
 from diffpy.pdfmorph.morphs.morph import *
+
 
 class MorphXtalPDFtoRDF(Morph):
     '''Morph crystal PDFs to RDFs.
 
     This morphs both the objective and the reference.
 
-    Configuration variables:
+    Attributes:
 
     baselineslope   --  The slope of the PDF baseline.  With the perfect scale,
                         the baseline slope is equal to -4*pi*rho0, where rho0
@@ -44,7 +45,6 @@ class MorphXtalPDFtoRDF(Morph):
     yinlabel = LABEL_GR
     xoutlabel = LABEL_RA
     youtlabel = LABEL_RR
-    parnames = ["baselineslope"]
 
     def morph(self, xobj, yobj, xref, yref):
         """Morph to the RDF."""

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -6,7 +5,7 @@
 #                   (c) 2010 Trustees of the Columbia University
 #                   in the City of New York.  All rights reserved.
 #
-# File coded by:    Chris Farrow
+# File coded by:    Pavol Juhas, Chris Farrow
 #
 # See AUTHORS.txt for a list of people who contributed.
 # See LICENSE.txt for license information.
@@ -16,28 +15,9 @@
 """Definition of morphs.
 """
 
-
-__id__ = "$Id: __init__.py 1613 2012-03-14 18:56:22Z juhas $"
-
-from diffpy.pdfmorph.morphs.morph import Morph
-from diffpy.pdfmorph.morphs.morphchain import MorphChain
-from diffpy.pdfmorph.morphs.morphpdftordf import MorphXtalPDFtoRDF
-from diffpy.pdfmorph.morphs.morphrdftopdf import MorphXtalRDFtoPDF
-from diffpy.pdfmorph.morphs.morphresolution import MorphResolutionDamping
-from diffpy.pdfmorph.morphs.morphrgrid import MorphRGrid
-from diffpy.pdfmorph.morphs.morphscale import MorphScale
-from diffpy.pdfmorph.morphs.morphshape import MorphSphere, MorphSpheroid
-from diffpy.pdfmorph.morphs.morphishape import MorphISphere, MorphISpheroid
-from diffpy.pdfmorph.morphs.morphshift import MorphShift
-from diffpy.pdfmorph.morphs.morphsmear import MorphSmear
-from diffpy.pdfmorph.morphs.morphstretch import MorphStretch
-
-# List of morphs
-morphs = [ MorphRGrid, MorphScale, MorphStretch, MorphXtalPDFtoRDF, MorphSmear,
-        MorphXtalRDFtoPDF, MorphSphere, MorphSpheroid, MorphISphere,
-        MorphISpheroid, MorphResolutionDamping, MorphShift]
+__id__ = "$Id$"
 
 # obtain version information
-from diffpy.pdfmorph import __version__
+from diffpy.pdfmorph.version import __version__
 
 # End of file

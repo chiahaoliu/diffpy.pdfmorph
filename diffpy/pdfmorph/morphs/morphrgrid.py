@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -18,7 +17,7 @@
 """
 
 # module version
-__id__ = "$Id: morphrgrid.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 
 import numpy
@@ -33,7 +32,7 @@ class MorphRGrid(Morph):
     This resamples both the objective and reference arrays to be on the
     specified grid.
 
-    Configuration variables:
+    Attributes:
 
     rmin    --  The lower-bound on the r-range.
     rmax    --  The upper-bound on the r-range (exclusive within tolerance of
@@ -52,7 +51,6 @@ class MorphRGrid(Morph):
     yinlabel = LABEL_GR
     xoutlabel = LABEL_RA
     youtlabel = LABEL_GR
-    parnames = ["rmin", "rmax", "rstep"]
 
     def morph(self, xobj, yobj, xref, yref):
         """Resample arrays onto specified grid."""

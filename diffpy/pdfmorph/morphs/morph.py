@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -18,7 +17,7 @@
 """
 
 # module version
-__id__ = "$Id: morph.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 LABEL_RA = 'r (A)'     # r-grid
 LABEL_GR = 'G (1/A^2)' # PDF G(r)
@@ -36,16 +35,13 @@ class Morph(object):
     morph may modify the config dictionary. This is the means by which to
     communicate automatically modified attributes.
 
-    Class attributes:
-
     summary      -- short description of a morph
     xinlabel     -- descriptive label for the x input array
     yinlabel     -- descriptive label for the y input array
     xoutlabel    -- descriptive label for the x output array
     youtlabel    -- descriptive label for the y output array
-    parnames     -- list of names of configuration variables
 
-    Instance attributes:
+    Instance variables:
 
     config      -- dictionary that contains all configuration variables
     xobjin      -- last objective input x data
@@ -73,7 +69,6 @@ class Morph(object):
     yinlabel = 'y'
     xoutlabel = 'x'
     youtlabel = 'y'
-    parnames = []
 
     # Properties
 
@@ -95,8 +90,7 @@ class Morph(object):
         config  -- dictionary that contains all configuration variables
         '''
         # declare empty attributes
-        if config is None:
-            config = {}
+        self.config = None
         self.xobjin = None
         self.yobjin = None
         self.xobjout = None
@@ -106,7 +100,8 @@ class Morph(object):
         self.xrefout = None
         self.yrefout = None
         # process arguments
-        self.applyConfig(config)
+        if config is not None:
+            self.applyConfig(config)
         return
 
 
@@ -114,7 +109,7 @@ class Morph(object):
         '''Morph arrays objective or reference.
 
         xobj, yobj  --  Objective arrays.
-        xref, yref  --  Reference arrays.
+        xobj, yobj  --  Objective arrays.
 
         Identity operation.  This method should be overloaded in a derived
         class.
@@ -202,25 +197,12 @@ class Morph(object):
         Return self.config.get(name).
         Raise AttributeError, when name is not available from self.config.
         '''
-        if name in self.config:
+        if self.config is not None and name in self.config:
             return self.config[name]
         else:
             emsg = 'Object has no attribute %r' % name
             raise AttributeError(emsg)
-
-
-    def __setattr__(self, name, val):
-        '''Set configuration variables to config.
-
-        name -- name of the attribute
-        val  -- value of the attribute
-
-        '''
-        if name in self.parnames:
-            self.config[name] = val
-        else:
-            object.__setattr__(self, name, val)
-        return
+        return rv
 
 # End class Morph
 
