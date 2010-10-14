@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -18,7 +17,7 @@
 """
 
 # module version
-__id__ = "$Id: morphstretch.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 
 import numpy
@@ -29,10 +28,10 @@ class MorphStretch(Morph):
 
     This stretches (broadens) the objective.
 
-    Configuration variables:
+    Attributes:
 
-    stretch --  The stretch factor to apply to yobjin. This is applied such
-                that a feature at r is moved to r * (1 + stretch).
+    epsilon --  The stretch factor to apply to yobjin. This is applied such
+                that a feature at r is moved to r * (1 + epsilon).
 
     '''
 
@@ -42,15 +41,14 @@ class MorphStretch(Morph):
     yinlabel = LABEL_GR
     xoutlabel = LABEL_RA
     youtlabel = LABEL_GR
-    parnames = ["stretch"]
 
     def morph(self, xobj, yobj, xref, yref):
         """Resample arrays onto specified grid."""
         Morph.morph(self, xobj, yobj, xref, yref)
-        if self.stretch == 0:
+        if self.epsilon == 0:
             return self.xyallout
 
-        r = self.xobjin / (1.0 + self.stretch)
+        r = self.xobjin / (1.0 + self.epsilon)
         self.yobjout = numpy.interp(r, self.xobjin, self.yobjin)
         return self.xyallout
 
