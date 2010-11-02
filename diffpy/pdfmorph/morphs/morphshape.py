@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -14,15 +13,14 @@
 ##############################################################################
 
 
-"""class MorphSphere -- apply a spherical shape function to the objective
-class MorphSpheroid -- apply a spheroidal shape function to the objective
+"""class MorphShape -- apply a shape function to the objective
 """
 
 # module version
-__id__ = "$Id: morphshape.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 import numpy
-from numpy import sqrt
+from numpy import pi, sqrt, log, exp, log2, ceil, sign
 from numpy import arctan as atan
 from numpy import arctanh as atanh
 
@@ -59,7 +57,7 @@ class MorphSpheroid(Morph):
 
     Configuration variables:
 
-    radius   --  The equatorial radius of the spheroid
+    eradius  --  The equatorial radius of the spheroid
     pradius  --  The polar radius of the spheroid
 
     '''
@@ -70,16 +68,16 @@ class MorphSpheroid(Morph):
     yinlabel = LABEL_GR
     xoutlabel = LABEL_RA
     youtlabel = LABEL_GR
-    parnames = ["radius", "pradius"]
+    parnames = ["eradius", "pradius"]
 
     def morph(self, xobj, yobj, xref, yref):
         """Apply a scale factor."""
         Morph.morph(self, xobj, yobj, xref, yref)
-        f = _spheroidalCF(xobj, self.radius, self.pradius)
+        f = _spheroidalCF(xobj, self.eradius, self.pradius)
         self.yobjout *= f
         return self.xyallout
 
-# End of class MorphSpheroid
+# End of class MorphScale
 
 def _sphericalCF(r, psize):
     """Spherical nanoparticle characteristic function.
