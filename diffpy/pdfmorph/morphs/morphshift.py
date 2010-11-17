@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -18,7 +17,7 @@
 """
 
 # module version
-__id__ = "$Id: morphshift.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 from diffpy.pdfmorph.morphs.morph import *
 import numpy
@@ -37,7 +36,7 @@ class MorphShift(Morph):
     '''
 
     # Define input output types
-    summary = 'Shift objective by specified amount'
+    summary = 'Vertically shift objective by specified amount'
     xinlabel = LABEL_RA
     yinlabel = LABEL_GR
     xoutlabel = LABEL_RA
