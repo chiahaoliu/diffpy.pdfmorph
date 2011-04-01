@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -21,7 +20,7 @@ plog -- logger instance for normal operation
 """
 
 # module version
-__id__ = "$Id: log.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 import logging
 

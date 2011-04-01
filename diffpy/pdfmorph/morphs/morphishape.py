@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##############################################################################
 #
 # diffpy.pdfmorph   by DANSE Diffraction group
@@ -19,7 +18,7 @@ class MorphISpheroid -- apply inverse spheroidal shape function
 """
 
 # module version
-__id__ = "$Id: morphishape.py 1613 2012-03-14 18:56:22Z juhas $"
+__id__ = "$Id$"
 
 from diffpy.pdfmorph.morphs.morph import *
 from diffpy.pdfmorph.morphs.morphshape import _sphericalCF, _spheroidalCF
